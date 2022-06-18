@@ -223,6 +223,7 @@
   (setq projectile-project-search-path '("~/proyectos")))
 
 (use-package magit)
+(setq magit-display-buffer-function 'switch-to-buffer)
 
 (use-package ranger)
 
