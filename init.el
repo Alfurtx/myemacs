@@ -34,6 +34,15 @@
 (setq visible-bell 1)
 (setq ring-bell-function 'ignore)
 
+(setq-default mode-line-format nil)
+(setq mode-line-format nil)
+
+(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
+(setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+(setq scroll-margin 4)
+
 (global-hl-line-mode 1)
 (set-face-attribute 'hl-line nil :inherit nil :background "midnight blue")
 (push "/home/fonsi/proyectos/myemacs/themes/" custom-theme-load-path)
@@ -154,7 +163,6 @@
   (evil-collection-init '(magit dired)))
 (use-package evil-tutor)
 
-
 (use-package general
   :config
   (general-evil-setup 1))
@@ -209,9 +217,14 @@
 (setq load-prefer-newer noninteractive)
 
 (use-package projectile
-  :config (projectile-global-mode 1))
+  :init
+  (projectile-mode +1)
+  :config
+  (setq projectile-project-search-path '("~/proyectos")))
 
 (use-package magit)
+
+(use-package ranger)
 
 (nvmap :prefix "SPC"
   "b" '(:ignore t :wk "BUFFERS")
@@ -226,6 +239,17 @@
 (nvmap :prefix "SPC"
   "g" '(:ignore t :wk "GIT")
   "g g" '(magit :wk "Magit"))
+
+(nvmap :prefix "SPC"
+  "p" '(:ignore t :wk "PROJECTS")
+  "p p" '(projectile-switch-project :wk "Projects")
+  "p a" '(projectile-add-known-project :wk "Add project")
+  "p d" '(projectile-remove-known-project :wk "Remove project"))
+
+(nvmap :prefix "SPC"
+  "SPC" '(counsel-find-file :wk "Find file")
+  "." '(ranger :wk "Open ranger")
+  ":" '(counsel-M-x :wk "Find command"))
 
 (provide 'init)
 ;;; init.el ends here
