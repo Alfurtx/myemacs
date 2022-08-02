@@ -1,0 +1,1 @@
+("~/proyectos/myemacs/" "~/.config/" "~/proyectos/fizzbuzz/" "~/proyectos/cclibs/" "~/proyectos/myportfolio/" "~/proyectos/yadbg/" "~/proyectos/minecraft_opengl/" "~/proyectos/yawm/" "~/pictures/wallpapers/" "~/proyectos/homedrive/")

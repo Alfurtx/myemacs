@@ -33,9 +33,12 @@
 
 (setq visible-bell 1)
 (setq ring-bell-function 'ignore)
+(setq-default truncate-lines 1)
 
-(setq-default mode-line-format nil)
-(setq mode-line-format nil)
+;; (setq-default mode-line-format nil)
+;; (setq mode-line-format nil)
+
+(setq make-backup-files nil)
 
 (setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
 (setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
@@ -44,9 +47,21 @@
 (setq scroll-margin 4)
 
 (global-hl-line-mode 1)
-(set-face-attribute 'hl-line nil :inherit nil :background "midnight blue")
-(push "/home/fonsi/proyectos/myemacs/themes/" custom-theme-load-path)
-(load-theme 'handmadehero t)
+;; (set-face-attribute 'hl-line nil :inherit nil :background "midnight blue")
+;; (push "/home/fonsi/proyectos/myemacs/themes" custom-theme-load-path)
+;; (load-theme 'handmadehero t)
+;; 
+;; (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode))
+;; (make-face 'font-lock-fixme-face)
+;; (make-face 'font-lock-note-face)
+;; (mapc (lambda (mode)
+;;         (font-lock-add-keywords
+;;          mode
+;;          '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+;;            ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+;;       fixme-modes)
+;; (modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
+;; (modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -71,11 +86,27 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(use-package naysayer-theme
+  :config
+  (load-theme 'naysayer t)
+  (set-face-attribute 'default nil :height 170)
+  ;; MODELINE customization
+  (setq mode-line-format
+	(delete 'mode-line-modes mode-line-format)))
+
+(use-package doom-modeline
+  :init
+  ;; (doom-modeline-mode 1)
+  ;; (setq doom-modeline-height 15)
+  ;; (setq doom-modeline-modal-icon nil)
+  ;; (setq doom-modeline-buffer-file-name-style 'relative-to-project)
+  )
+
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)	
+         ("TAB" . ivy-alt-done)
          ("C-l" . ivy-alt-done)
          ("C-j" . ivy-next-line)
          ("C-k" . ivy-previous-line)
@@ -109,10 +140,20 @@
 (use-package swiper)
 
 (use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 0.3))
+  :init
+  (setq which-key-side-window-location 'bottom
+        which-key-sort-order #'which-key-key-order-alpha
+        which-key-sort-uppercase-first nil
+        which-key-add-column-padding 1
+        which-key-max-display-columns nil
+        which-key-min-display-lines 6
+        which-key-side-window-slot -10
+        which-key-side-window-max-height 0.25
+        which-key-idle-delay 0.8
+        which-key-max-description-length 25
+        which-key-allow-imprecise-window-fit t
+        which-key-separator " → " ))
+(which-key-mode)
 
 (use-package ivy-rich
   :after ivy
@@ -169,24 +210,17 @@
 
 (use-package ivy-posframe
   :init
-  (setq ivy-posframe-display-functions-alist
-    '((swiper                     . ivy-posframe-display-at-point)
-      (complete-symbol            . ivy-posframe-display-at-point)
-      (counsel-M-x                . ivy-display-function-fallback)
-      (counsel-esh-history        . ivy-posframe-display-at-window-center)
-      (counsel-describe-function  . ivy-display-function-fallback)
-      (counsel-describe-variable  . ivy-display-function-fallback)
-      (counsel-find-file          . ivy-display-function-fallback)
-      (counsel-recentf            . ivy-display-function-fallback)
-      (counsel-register           . ivy-posframe-display-at-frame-bottom-window-center)
-      (dmenu                      . ivy-posframe-display-at-frame-top-center)
-      (nil                        . ivy-posframe-display))
-    ivy-posframe-height-alist
-    '((swiper . 20)
-      (dmenu . 20)
-      (t . 10)))
+  (setq ivy-posframe-parameters
+	'((left-fringe . 8)
+	  (internal-border-width . 2)
+	  (right-fringe . 8)))
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
+  ;; (setq ivy-posframe-height-alist '((swiper . 20) (dmenu . 20) (t . 10)))
   :config
-  (ivy-posframe-mode 1)) ; 1 enables posframe-mode, 0 disables it.
+  (ivy-posframe-mode 1)
+  :custom-face
+  (ivy-posframe-border ((t (:background "#ffffff"))))
+  ) ; 1 enables posframe-mode, 0 disables it.
 
 ;; Using garbage magic hack.
  (use-package gcmh
@@ -222,15 +256,107 @@
   :config
   (setq projectile-project-search-path '("~/proyectos")))
 
-(use-package magit)
-(setq magit-display-buffer-function 'switch-to-buffer)
+(use-package magit :ensure t)
+(require 'magit)
+(setq magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
 
-(use-package ranger)
+(use-package ranger
+  :config
+  (setq ranger-show-hidden t))
+
+(use-package auto-package-update
+  :custom
+  (auto-package-update-interval 7)
+  (auto-package-udpate-hide-results t)
+  :config
+  (auto-package-update-maybe))
+
+;; (use-package golden-ratio
+;;   :init
+;;   (golden-ratio-mode 1)
+;;   :config
+;;   (setq golden-ratio-auto-scale t))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode +1))
+
+(use-package lsp-mode
+  :hook ((c++-mode . lsp)
+	 (c-mode . lsp)
+	 (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-lens-enable nil)
+  (setq lsp-clients-clangd-args
+	'("-j=4"
+	  "--background-index"
+	  "--clang-tidy"
+	  "--header-insertion=never")))
+
+(use-package rustic
+  :config
+  (setq rustic-lsp-setup-p nil)
+  (setq rustic-lsp-client nil)
+  (remove-hook 'rustic-mode-hook 'flycheck-mode)
+  (setq rustic-format-on-save t))
+
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+
+(use-package flycheck
+  :init (global-flycheck-mode))
+
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+(use-package editorconfig
+  :config
+  (editorconfig-mode 1))
+
+(use-package smartparens
+  :config
+  (smartparens-global-mode 1)
+  (require 'smartparens-config))
+
+(use-package flx)
+
+;; (use-package all-the-icons-ivy
+;;   :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup))
+
+(use-package clang-format
+  :init (setq clang-format-style "file"))
+
+(defun clang-format-on-save ()
+       (when (or
+              (eq major-mode 'c-mode)
+              (eq major-mode 'c++-mode))
+         (clang-format-buffer)))
+  
+(add-hook 'before-save-hook #'clang-format-on-save)
+
+(use-package company
+  :init
+  (setq company-format-margin-function 'company-text-icons-margin)
+  :config
+  (define-key company-active-map (kbd "C-j") 'company-select-next)
+  (define-key company-active-map (kbd "C-k") 'company-select-previous)
+  (define-key company-search-map (kbd "C-j") 'company-select-next)
+  (define-key company-search-map (kbd "C-k") 'company-select-previous)
+  (global-company-mode))
+
+(use-package consult-lsp)
+
+(nvmap :prefix "SPC"
+  "l" '(:ignore t :wk "LSP")
+  "l s" '(lsp-ivy-workspace-symbol :wk "Search symbol")
+  "l r" '(lsp-rename :wk "Rename")
+  "l d" '(consult-flycheck :wk "See diagnostics")
+  )
 
 (nvmap :prefix "SPC"
   "b" '(:ignore t :wk "BUFFERS")
-  "b b" '(ibuffer :wk "Ibuffer")
-  "b k" '(kill-current-buffer :wk "Kill buffer"))
+  "b b" '(counsel-switch-buffer :wk "Ibuffer")
+  "b d" '(kill-current-buffer :wk "Kill buffer"))
 
 (nvmap :states '(normal visual) :keymaps 'override :prefix "SPC"
   "e" '(:ignore t :wk "EVAL")
@@ -243,14 +369,72 @@
 
 (nvmap :prefix "SPC"
   "p" '(:ignore t :wk "PROJECTS")
-  "p p" '(projectile-switch-project :wk "Projects")
+  "p f" '(counsel-projectile-find-file :wk "Find file in project")
+  "p p" '(counsel-projectile-switch-project :wk "Projects")
   "p a" '(projectile-add-known-project :wk "Add project")
   "p d" '(projectile-remove-known-project :wk "Remove project"))
 
 (nvmap :prefix "SPC"
-  "SPC" '(counsel-find-file :wk "Find file")
+  "f" '(:ignore t :wk "FILES")
+  "f f" '(counsel-file-jump :wk "Find file")
+  "f r" '(counsel-recentf :wk "Recent files")
+  "f p" '((lambda () (interactive) (counsel-find-file "~/proyectos/myemacs/")) :wk "Private Config"))
+
+(nvmap :prefix "SPC"
+  "SPC" '(counsel-find-file :wk "Explore files")
   "." '(ranger :wk "Open ranger")
+  "m" '(call-last-kbd-macro :wk "Call Macro")
+  "q" '(save-buffers-kill-emacs :wk "Quit")
   ":" '(counsel-M-x :wk "Find command"))
+
+(nvmap :prefix "SPC"
+  "c" '(:ignore t :wk "CODE")
+  "c c" '(counsel-compile :wk "Compile")
+  "c C" '(comment-or-uncomment-region :wk "Comment region"))
+
+(nvmap :prefix "SPC"
+  "w" '(:ignore t :wk "WINDOW")
+  "w d"   '(evil-window-delete :which-key "Close window")
+  "w n"   '(evil-window-new :which-key "New window")
+  "w s"   '(evil-window-split :which-key "Horizontal split window")
+  "w v"   '(evil-window-vsplit :which-key "Vertical split window")
+  ;; Window motions
+  "w h"   '(evil-window-left :which-key "Window left")
+  "w j"   '(evil-window-down :which-key "Window down")
+  "w k"   '(evil-window-up :which-key "Window up")
+  "w l"   '(evil-window-right :which-key "Window right")
+  "w +"   '(evil-window-increase-width :which-key "Window increase width")
+  "w w"   '(evil-window-next :which-key "Goto next window"))
+
+;; POPUP rules
+
+(add-to-list 'display-buffer-alist '("\\*compilation\\*"
+				      (display-buffer-in-side-window)
+				      (side . left)
+				      (slot . 1)
+				      (window-width . shrink-window-if-larger-than-buffer)
+				      (dedicated . t)))
+(add-to-list 'display-buffer-alist '("\\*rustic-compilation\\*"
+				      (display-buffer-in-side-window)
+				      (side . left)
+				      (slot . 1)
+				      (window-width . shrink-window-if-larger-than-buffer)
+				      (dedicated . t)))
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("6ae64ffd3a4043be42c6d4e4e25c0498b1b2d7c4608c4f1dd908667f95a18bb4" "583277bd24a057630e73b5d72cd78d06f520a0accde5d9d8746d1f9598f38fd8" default))
+ '(package-selected-packages
+   '(rustic naysayer-theme consult-lsp company-fuzzy company clang-format all-the-icons-ivy flx flycheck doom-modeline magit smartparens editorconfig lsp-ivy lsp-mode counsel-projectile which-key use-package smex ranger projectile ivy-rich ivy-posframe golden-ratio general gcmh evil-tutor evil-collection counsel auto-package-update all-the-icons)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ivy-posframe-border ((t (:background "#ffffff")))))
