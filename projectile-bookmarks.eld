@@ -1,1 +1,1 @@
-("~/proyectos/myemacs/" "~/.config/" "~/proyectos/fizzbuzz/" "~/proyectos/cclibs/" "~/proyectos/myportfolio/" "~/proyectos/yadbg/" "~/proyectos/minecraft_opengl/" "~/proyectos/yawm/" "~/pictures/wallpapers/" "~/proyectos/homedrive/")
+("~/proyectos/myemacs/" "~/proyectos/liberation_mono_ligatures/" "~/proyectos/rust_raytracer/" "~/proyectos/yawm/" "~/.config/emacs/" "~/.config/" "~/proyectos/myportfolio/" "~/proyectos/yadbg/" "~/proyectos/minecraft_opengl/" "~/pictures/wallpapers/" "~/proyectos/homedrive/")

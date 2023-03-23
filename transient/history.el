@@ -6,4 +6,5 @@
  (magit-log
   ("-n256" "--graph" "--color" "--decorate")
   ("-n256" "--graph" "--decorate"))
- (magit-patch nil))
+ (magit-patch nil)
+ (magit-push nil))
