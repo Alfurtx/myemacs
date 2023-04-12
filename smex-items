@@ -1,59 +1,26 @@
 
 ;; ----- smex-history -----
 (
- downcase-region
- downcase-word
- flymake-show-diagnostic
- xref-find-apropos
- consult-eglot-symbols
- consult-lsp-symbols
- package-delete
+ execute-extended-command-for-buffer
+ execute-extended-command
+ projectile-grep
+ ido-enter-magit-status
+ ido-kill-buffer
+ ido-dired
+ find-grep
 )
 
 ;; ----- smex-data -----
 (
- (customize-create-theme . 2)
- (lsp-install-server . 2)
- (lsp-clangd-find-other-file . 7)
- (lsp-describe-session . 1)
- (customize-group . 1)
- (text-scale-increase . 1)
- (call-last-kbd-macro . 14)
- (comment-region . 1)
- (magit . 3)
- (magit-status . 1)
- (projectile-discover-projects-in-search-path . 1)
- (counsel-package . 1)
- (magit-refresh . 1)
- (magit-log . 1)
- (package-delete . 4)
- (list-packages . 1)
- (package-install . 1)
- (lsp-rename . 3)
- (counsel-flycheck . 5)
- (flycheck-buffer . 2)
- (global-flycheck-mode . 2)
- (flycheck-first-error . 1)
- (diff-apply-hunk . 1)
- (counsel-recentf . 4)
- (toggle-truncate-lines . 1)
- (make-directory . 1)
- (lsp-execute-code-action . 1)
- (lsp-ivy-workspace-symbol . 3)
- (consult-lsp-symbols . 3)
- (consult-lsp-file-symbols . 1)
- (lsp-ivy-global-workspace-symbol . 1)
- (flycheck-list-errors . 1)
- (lsp-document-highlight . 1)
- (lsp-signature-toggle-full-docs . 1)
- (evil-window-move-far-right . 1)
- (lsp-restart-workspace . 2)
- (flycheck-verify-setup . 1)
- (flycheck-verify-checker . 1)
- (rustic-compile . 1)
- (consult-eglot-symbols . 2)
- (xref-find-apropos . 3)
- (flymake-show-diagnostic . 2)
- (downcase-word . 2)
- (downcase-region . 4)
+ (describe-font . 5)
+ (comment-line . 3)
+ (ido-find-file . 1)
+ (describe-theme . 1)
+ (find-grep . 1)
+ (ido-dired . 1)
+ (ido-kill-buffer . 1)
+ (ido-enter-magit-status . 1)
+ (projectile-grep . 1)
+ (execute-extended-command . 1)
+ (execute-extended-command-for-buffer . 1)
 )

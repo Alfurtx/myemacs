@@ -1,1 +1,1 @@
-("~/proyectos/myemacs/" "~/proyectos/liberation_mono_ligatures/" "~/proyectos/rust_raytracer/" "~/proyectos/yawm/" "~/.config/emacs/" "~/.config/" "~/proyectos/myportfolio/" "~/proyectos/yadbg/" "~/proyectos/minecraft_opengl/" "~/pictures/wallpapers/" "~/proyectos/homedrive/")
+("~/.config/emacs/" "~/proyectos/myemacs/" "~/proyectos/textus/" "~/.config/" "~/proyectos/custom_iosevka_font/" "~/proyectos/rust_raytracer/" "~/proyectos/yawm/" "~/proyectos/myportfolio/" "~/proyectos/yadbg/" "~/proyectos/minecraft_opengl/" "~/pictures/wallpapers/" "~/proyectos/homedrive/")

@@ -1,3 +1,7 @@
+;;; package --- summary
+;;; commentary:
+;;; code:
+
 ;; Using garbage magic hack.
  (use-package gcmh
    :config
@@ -25,3 +29,7 @@
 ;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
 ;; to skip the mtime checks on every *.elc file.
 (setq load-prefer-newer noninteractive)
+
+(provide 'garbagecollection)
+
+;;; garbagecollection.el ends here

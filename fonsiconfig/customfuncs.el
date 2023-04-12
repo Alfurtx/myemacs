@@ -1,3 +1,7 @@
+;;; customfuncs.el --- Summary
+;;; commentary:
+;;; code:
+
 (defun move-to-right-window-or-vsplit ()
   (interactive)
   (if (window-at-side-p nil 'right)
@@ -6,7 +10,7 @@
 	(windmove-right)
 	)
     (windmove-right))
-  (golden-ratio)
+  (zoom)
   )
 (defun move-to-bottom-window-or-hsplit ()
   (interactive)
@@ -16,7 +20,7 @@
 	(windmove-down)
 	)
     (windmove-down))
-  (golden-ratio)
+  (zoom)
   )
 (defun move-to-up-window-or-hsplit ()
   (interactive)
@@ -25,7 +29,7 @@
 	(split-window-below)
 	)
     (windmove-up))
-  (golden-ratio)
+  (zoom)
   )
 (defun move-to-left-window-or-vsplit ()
   (interactive)
@@ -34,12 +38,20 @@
 	(split-window-right)
 	)
     (windmove-left))
-  (golden-ratio)
+  (zoom)
   )
 
 (defun maybe-projectile-find-file ()
   (interactive)
   (call-interactively
    (if (projectile-project-p)
-       #'counsel-projectile-find-file
-       #'counsel-find-file)))
+       #'projectile-find-file-dwim
+       #'ido-find-file)))
+
+(defun find-private-files ()
+  (interactive)
+  (find-file "~/proyectos/myemacs/init.el"))
+
+
+(provide 'customfuncs)
+;;; customfuncs.el ends here

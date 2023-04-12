@@ -2,108 +2,124 @@
 ;;; commentary:
 ;;; code:
 
-(load-file "~/proyectos/myemacs/fonsiconfig/misc.el")
+;; MISCELLANEOUS SETTINGS
+(setq inhibit-startup-message t)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -2)
+(set-fringe-mode 10)
+(menu-bar-mode -1)
+(setq visible-bell 1)
+(setq ring-bell-function 'ignore)
+(setq-default truncate-lines t)
+(setq make-backup-files nil)
+(setq scroll-conservatively 101)
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 3)))
+(setq mouse-wheel-progressive-speed t)
+(setq mouse-wheel-follow-mouse 't)
+(setq scroll-margin 4)
+(global-hl-line-mode 1)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(setq mode-line-format (delete 'mode-line-modes mode-line-format))
+(setq-default header-line-format mode-line-format)
+(setq-default mode-line-format nil)
+(setq compilation-scroll-output t)
+(setq gdb-many-windows t)
+(if (fboundp 'blink-cursor-mode) (blink-cursor-mode -1))
 
-;; Initialize package sources
+;; USE PACKAGE BOOTSTRAP
 (require 'package)
-
+(if (eq system-type 'gnu/linux) (setq package-user-dir "~/.config/emacs/packages"))
+(if (eq system-type 'windows-nt) (setq package-user-dir "E:/Herramientas/emacs/fonsi/packages"))
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
-
-(setq package-user-dir "~/proyectos/myemacs/packages")
-
 (package-initialize)
-(unless package-archive-contents
- (package-refresh-contents))
-
-;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-   (package-install 'use-package))
-
+(unless package-archive-contents (package-refresh-contents))
+(unless (package-installed-p 'use-package) (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(load-file "~/proyectos/myemacs/fonsiconfig/garbagecollection.el")
+;; THEMES
+(use-package naysayer-theme :config (load-theme 'naysayer t))
+(add-to-list 'default-frame-alist '(font . "Liberation Mono-16"))
+(set-face-attribute 'default t :font "Liberation Mono-16")
 
-; (add-hook 'prog-mode-hook #'flymake-mode)
 
-(use-package naysayer-theme
+;; EVIL VIM
+(use-package evil
+  :custom
+  (evil-want-keybinding nil)
+  (evil-vsplit-window-right t)
+  (evil-split-window-below t)
+  :init 
+  (evil-mode 1)
+  (use-package evil-collection :init (evil-collection-init '(magit dired)))
+  (use-package general :init (general-evil-setup 1))
   :config
-  (load-theme 'naysayer t)
-  (set-face-attribute 'default nil :height 200 :font "LiberationMono")
-  (set-face-attribute 'font-lock-variable-name-face nil :foreground "#d1b897")
-  (add-to-list 'default-frame-alist '(font . "LiberationMono-20")))
+  (evil-define-key '(insert normal) 'global (kbd "C-j") nil)
+  (evil-define-key '(insert normal) 'global (kbd "C-k") nil)
+  (evil-define-key '(visual insert) 'global (kbd "C-c") 'evil-normal-state)
+  (evil-define-key '(normal visual) 'global "K" (kbd "10k"))
+  (evil-define-key 'normal 'global "J" (kbd "10j"))
+  (evil-define-key 'normal 'global "L" (kbd "10l"))
+  (evil-define-key 'normal 'global "H" (kbd "10h"))
+  (evil-set-leader 'normal (kbd "SPC")))
 
-(load-file "~/proyectos/myemacs/fonsiconfig/ivy.el")
 
-(use-package which-key
-  :init
-  (which-key-setup-minibuffer)
-  (setq which-key-separator " → " )
-  (which-key-mode))
+;; COMPLETION SYSTEM
+(use-package imenu-anywhere)
+(use-package ido
+  :ensure nil
+  :init (ido-mode) (ido-everywhere)
+  :config
+  (use-package flx-ido :init (flx-ido-mode 1))
+  (use-package ido-completing-read+ :init (ido-ubiquitous-mode 1))
+  :custom
+  (ido-enable-flex-matching nil)
+  (ido-case-fold t)
+  (ido-use-virtual-buffers t)
+  (ido-enable-flex-matching t)
+  (ido-use-faces nil))
+(use-package corfu
+  :init (global-corfu-mode)
+  :custom
+  (corfu-cycle t)
+  (corfu-auto t)
+  (corfu-echo-documentation t)
+  :bind (:map corfu-map
+	      ("C-j" . corfu-next)
+	      ("C-k" . corfu-previous)
+	      ("<return>" . corfu-insert)
+	      ("<escape>" . corfu-quit)))
 
-(use-package flx)
 
-(use-package counsel
-  :demand t
-  :bind (("M-x" . counsel-M-x)))
-
-(use-package all-the-icons)
-
-(load-file "~/proyectos/myemacs/fonsiconfig/evil.el")
-
+;; PROJECT MANAGEMENT SYSTEM
 (use-package projectile
-  :init
-  (projectile-mode +1)
+  :init (projectile-mode 1)
   :config
-  (setq projectile-project-search-path '("~/proyectos")))
+  (add-to-list 'projectile-globally-ignored-directories "node_modules")
+  (add-to-list 'projectile-globally-ignored-directories "dependencies")
+  (add-to-list 'projectile-globally-ignored-directories "libs")
+  :custom
+  (projectile-project-search-path '("~/proyectos"))
+  (projectile-completion-system 'ido))
 
-(use-package magit
-  :ensure t
+;; MAGIT
+(use-package magit :config (setq magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
+
+;; EGLOT (LSP)
+(use-package eglot
+  :custom
+  (eglot-ignored-server-capabilites '(:signatureHelpProvider :documentHighlightProvider :codeActionProvider :codeLensProvider :foldingRangeProvider :inlayHintProvider))
   :config
-  (setq magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
+  (add-hook 'c-mode-hook #'eglot-ensure)
+  (add-hook 'c++-mode-hook #'eglot-ensure)
+  (add-hook 'rustic-mode-hook #'eglot-ensure)
+  (add-to-list 'eglot-server-programs '((c-mode c++-mode) . ("clangd" "-j=8" "--log=error" "--clang-tidy" "--header-insertion=never" "--background-index"))))
 
-(use-package golden-ratio
-  :init
-  (golden-ratio-mode 1)
-  :config
-  (setq golden-ratio-auto-scale t))
-
-(use-package counsel-projectile
-  :config (counsel-projectile-mode +1))
-
-;;; Language Server Protocol
-; (load-file "~/proyectos/myemacs/fonsiconfig/lsp.el")
-; (use-package eglot
-;   :config
-;   (add-hook 'prog-mode-hook #'eglot-ensure))
-; (use-package consult-eglot)
-
-;;; Code completion framework
-(use-package company
-  :init
-  (setq company-format-margin-function 'company-text-icons-margin)
-  :config
-  (define-key company-active-map (kbd "C-j") 'company-select-next)
-  (define-key company-active-map (kbd "C-k") 'company-select-previous)
-  (define-key company-search-map (kbd "C-j") 'company-select-next)
-  (define-key company-search-map (kbd "C-k") 'company-select-previous)
-  (global-company-mode))
-(use-package company-flx
-  :after company
-  :init
-  (company-flx-mode +1))
-
-(use-package editorconfig
-  :config
-  (editorconfig-mode 1))
-
-(use-package smartparens
-  :config
-  (smartparens-global-mode 1)
-  (require 'smartparens-config))
-
+;; FILE MANAGER
+(use-package dired-hide-dotfiles)
 (use-package dired-single)
 (use-package dired
   :ensure nil
@@ -111,40 +127,100 @@
   (setq dired-listing-switches "-alGhvF --group-directories-first")
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
-  (evil-collection-define-key 'normal 'dired-mode-map
-    "h" 'dired-up-directory
-    "l" 'dired-find-file))
-(use-package dired-hide-dotfiles
-  :hook (dired-mode . dired-hide-dotfiles-mode)
-  :config
-  (evil-collection-define-key 'normal 'dired-mode-map
-    "H" 'dired-hide-dotfiles-mode))
+  (evil-define-key 'normal dired-mode-map "c" 'find-file)
+  (evil-define-key 'normal dired-mode-map "h" 'dired-single-up-directory)
+  (evil-define-key 'normal dired-mode-map "l" 'dired-single-buffer))
 
+;; OTHERS (NO CATEGORY)
+(use-package editorconfig :init (editorconfig-mode 1))
+(use-package smartparens :init (smartparens-global-mode 1) (require 'smartparens-config))
+(use-package zoom)
+(use-package avy)
+(use-package glsl-mode)
 
-;;; CUSTOM WINDOW MANAGEMENT FUNCTIONS + OTHERS
-(load-file "~/proyectos/myemacs/fonsiconfig/customfuncs.el")
+;; CUSTOM FUNCTIONS
+(defun move-to-right-window-or-vsplit ()
+  (interactive)
+  (if (window-at-side-p nil 'right) (progn (split-window-right) (windmove-right)) (windmove-right))
+  (zoom))
+(defun move-to-bottom-window-or-hsplit ()
+  (interactive)
+  (if (window-at-side-p nil 'bottom) (progn (split-window-below) (windmove-down)) (windmove-down))
+  (zoom))
+(defun move-to-up-window-or-hsplit ()
+  (interactive)
+  (if (window-at-side-p nil 'top) (progn (split-window-below)) (windmove-up))
+  (zoom))
+(defun move-to-left-window-or-vsplit ()
+  (interactive)
+  (if (window-at-side-p nil 'left) (progn (split-window-right)) (windmove-left))
+  (zoom))
+(defun maybe-projectile-find-file ()
+  (interactive)
+  (call-interactively
+   (if (projectile-project-p)
+       #'projectile-find-file-dwim
+       #'ido-find-find)))
+(defun find-private-files ()
+  (interactive)
+  (ido-find-file-in-dir "~/.config/emacs"))
+(defun delete-window-and-balance ()
+  (interactive)
+  (delete-window)
+  (zoom))
 
-;;; WHICH KEY KEYMAPS
-(load-file "~/proyectos/myemacs/fonsiconfig/whichkeymaps.el")
+;; KEY MAPS
+(use-package which-key :init (which-key-setup-minibuffer) (which-key-mode))
+(evil-define-key '(normal visual) 'global (kbd "<leader>pc") 'projectile-compile-project)
+(evil-define-key '(normal visual) 'global (kbd "<leader>pp") 'projectile-switch-project)
+(evil-define-key '(normal visual) 'global (kbd "<leader>pa") 'projectile-add-known-project)
+(evil-define-key '(normal visual) 'global (kbd "<leader>pd") 'projectile-remove-known-project)
+(evil-define-key '(normal visual) 'global (kbd "<leader>pf") 'find-private-files)
 
+(evil-define-key '(normal visual) 'global (kbd "<leader>bd") 'kill-current-buffer)
+(evil-define-key '(normal visual) 'global (kbd "<leader>bb") 'consult-buffer)
+(evil-define-key '(normal visual) 'global (kbd "<leader>be") 'eval-buffer)
 
+(evil-define-key '(normal visual) 'global (kbd "<leader>g") 'magit)
+(evil-define-key '(normal visual) 'global (kbd "<leader>m") 'call-last-kbd-macro)
+(evil-define-key '(normal visual) 'global (kbd "<leader>k") 'compile)
+(evil-define-key '(normal visual) 'global (kbd "<leader>.") 'dired-jump)
+(evil-define-key '(normal visual) 'global (kbd "<leader>q") 'save-buffers-kill-emacs)
+(evil-define-key '(normal visual) 'global (kbd "<leader>:") 'execute-extended-command)
+(evil-define-key '(normal visual) 'global (kbd "<leader>SPC") 'ido-find-file)
+(evil-define-key '(normal visual) 'global (kbd "<leader>f") 'ido-switch-buffer)
+(evil-define-key '(normal visual) 'global (kbd "<leader>e") 'avy-goto-word-1)
+(evil-define-key '(normal visual) 'global (kbd "<leader>s") 'grep)
 
-(provide 'init)
+(evil-define-key '(normal visual) 'global (kbd "<leader>wh") 'move-to-left-window-or-vsplit)
+(evil-define-key '(normal visual) 'global (kbd "<leader>wl") 'move-to-right-window-or-vsplit)
+(evil-define-key '(normal visual) 'global (kbd "<leader>wj") 'move-to-bottom-window-or-hsplit)
+(evil-define-key '(normal visual) 'global (kbd "<leader>wk") 'move-to-up-window-or-hsplit)
+(evil-define-key '(normal visual) 'global (kbd "<leader>wm") 'maximize-window)
+(evil-define-key '(normal visual) 'global (kbd "<leader>wd") 'delete-window-and-balance)
+
+(evil-define-key '(normal visual) 'global (kbd "<leader>lr") 'eglot-rename)
+(evil-define-key '(normal visual) 'global (kbd "<leader>ls") 'imenu-anywhere)
+
+;; POPUP CUSTOMIZATION
+(customize-set-variable
+ 'display-buffer-alist
+ '(("\\*compilation\\*" (display-buffer-at-bottom) (window-height . 0.25))
+   ("\\*grep\\*" (display-buffer-at-bottom) (window-height . 0.25))))
+
 ;;; init.el ends here
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("6ae64ffd3a4043be42c6d4e4e25c0498b1b2d7c4608c4f1dd908667f95a18bb4" "583277bd24a057630e73b5d72cd78d06f520a0accde5d9d8746d1f9598f38fd8" default))
  '(eglot-ignored-server-capabilities
-   '(:hoverProvider :documentHighlightProvider :codeActionProvider :codeLensProvider :documentRangeFormattingProvider :documentOnTypeFormattingProvider :documentLinkProvider :colorProvider :foldingRangeProvider :executeCommandProvider))
+   '(:signatureHelpProvider :documentHighlightProvider :codeActionProvider :codeLensProvider :foldingRangeProvider :inlayHintProvider) nil nil "Customized with use-package eglot")
  '(package-selected-packages
-   '(dired-hide-dotfiles dired dired-single consult-eglot eglot company-flx naysayer-theme consult-lsp company-fuzzy company clang-format all-the-icons-ivy flx flycheck doom-modeline magit smartparens editorconfig lsp-ivy lsp-mode counsel-projectile which-key use-package smex ranger projectile ivy-rich ivy-posframe golden-ratio general gcmh evil-tutor evil-collection counsel auto-package-update all-the-icons)))
+   '(which-key glsl-mode avy zoom smartparens editorconfig dired-single dired-hide-dotfiles eglot magit projectile corfu ido-completing-read+ flx-ido imenu-anywhere general evil-collection evil naysayer-theme use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ivy-posframe-border ((t (:background "#ffffff")))))
+ )

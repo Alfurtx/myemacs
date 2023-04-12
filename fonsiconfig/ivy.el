@@ -25,44 +25,58 @@
   (setq ivy-use-virtual-buffers t)
   (setq ivy-wrap t)
   (setq ivy-count-format "(%d/%d) ")
-  (setq enable-recursive-minibuffers t)
-
-  ;; Use different regex strategies per completion command
-  (push '(completion-at-point . ivy--regex-fuzzy) ivy-re-builders-alist) ;; This doesn't seem to work...
-  (push '(swiper . ivy--regex-ignore-order) ivy-re-builders-alist)
-  (push '(counsel-M-x . ivy--regex-ignore-order) ivy-re-builders-alist)
-
-  ;; Set minibuffer height for different commands
-  (setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
-  (setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
-  (setf (alist-get 'swiper ivy-height-alist) 15)
-  (setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7))
+  (setq enable-recursive-minibuffers t))
 
 (use-package ivy-rich
   :after ivy
-  :custom
-  (ivy-virtual-abbreviate 'full
-   ivy-rich-switch-buffer-align-virtual-buffer t
-   ivy-rich-path-style 'abbrev)
+  ; :custom
+  ; (ivy-virtual-abbreviate 'full)
+  ; (ivy-rich-switch-buffer-align-virtual-buffer t)
+  ; (ivy-rich-path-style 'abbrev)
   :config
-  (ivy-set-display-transformer 'ivy-switch-buffer
-                               'ivy-rich-switch-buffer-transformer)
   (ivy-rich-mode 1)) ;; this gets us descriptions in M-x.
 
 (use-package ivy-posframe
-  ; :disabled t
   :init
   (setq ivy-posframe-parameters
 	'((left-fringe . 8)
 	  (internal-border-width . 2)
 	  (right-fringe . 8)))
-  ; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
-  ;; (setq ivy-posframe-height-alist '((swiper . 20) (dmenu . 20) (t . 10)))
   :config
   (ivy-posframe-mode 1)
   :custom-face
   (ivy-posframe-border ((t (:background "#ffffff")))))
+
+(use-package flx)
+
+(use-package orderless
+  :after ivy
+  :ensure t
+  :config
+  (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+  (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
+(use-package counsel
+  :after ivy
+  :config
+  (setq counsel-find-file-ignore-regexp "dependencies.*\\|deps.*\\|dep.*\\|libraries.*\\|lib.*\\|libs.*")
+  :bind (("M-x" . counsel-M-x)))
+
+(use-package counsel-projectile
+  :after counsel
+  :config (counsel-projectile-mode +1))
+
+(use-package ivy-xref
+  :ensure t
+  :after ivy
+  :init
+  (when (>= emacs-major-version 27)
+    (setq xref-show-definitions-function #'ivy-xref-show-defs))
+  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (provide 'ivy)
 ;;; ivy.el ends here
