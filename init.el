@@ -169,12 +169,14 @@
   (delete-window)
   (zoom))
 
+
 ;; KEY MAPS
 (use-package which-key :init (which-key-setup-minibuffer) (which-key-mode))
 (evil-define-key '(normal visual) 'global (kbd "<leader>pc") 'projectile-compile-project)
 (evil-define-key '(normal visual) 'global (kbd "<leader>pp") 'projectile-switch-project)
 (evil-define-key '(normal visual) 'global (kbd "<leader>pa") 'projectile-add-known-project)
 (evil-define-key '(normal visual) 'global (kbd "<leader>pd") 'projectile-remove-known-project)
+(evil-define-key '(normal visual) 'global (kbd "<leader>ps") 'projectile-grep)
 (evil-define-key '(normal visual) 'global (kbd "<leader>pf") 'find-private-files)
 
 (evil-define-key '(normal visual) 'global (kbd "<leader>bd") 'kill-current-buffer)
