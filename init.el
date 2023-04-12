@@ -64,7 +64,7 @@
   (evil-define-key 'normal 'global "J" (kbd "10j"))
   (evil-define-key 'normal 'global "L" (kbd "10l"))
   (evil-define-key 'normal 'global "H" (kbd "10h"))
-  (evil-set-leader 'normal (kbd "SPC")))
+  (evil-set-leader '(normal emacs) (kbd "SPC")))
 
 
 ;; COMPLETION SYSTEM
@@ -134,9 +134,11 @@
 ;; OTHERS (NO CATEGORY)
 (use-package editorconfig :init (editorconfig-mode 1))
 (use-package smartparens :init (smartparens-global-mode 1) (require 'smartparens-config))
-(use-package zoom)
 (use-package avy)
 (use-package glsl-mode)
+
+;; ZOOM
+(use-package zoom)
 
 ;; CUSTOM FUNCTIONS
 (defun move-to-right-window-or-vsplit ()
@@ -207,8 +209,13 @@
 ;; POPUP CUSTOMIZATION
 (customize-set-variable
  'display-buffer-alist
- '(("\\*compilation\\*" (display-buffer-at-bottom) (window-height . 0.25))
-   ("\\*grep\\*" (display-buffer-at-bottom) (window-height . 0.25))))
+ '(("\\*compilation\\*"
+    (display-buffer-at-bottom)
+    (window-height . 0.25))
+   ("\\*grep\\*"
+    (display-buffer-at-bottom)
+    (window-height . 0.25))
+   ))
 
 ;;; init.el ends here
 (custom-set-variables
